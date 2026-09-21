@@ -1,3 +1,8 @@
-﻿backup/
+backup/
 *.xlsx
 .DS_Store
+.trae/
+gis/
+read_xlsx.py
+__pycache__/
+*.pyc

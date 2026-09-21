@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="docTitle">湖北省住建厅机会点作战地图</title>
+
+<!-- ============ 全局样式 ============ -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="../assets/css/theme.css"/>
+<link rel="stylesheet" href="../assets/css/province.css"/>
+<link rel="stylesheet" href="../assets/css/data-importer.css"/>
+
+<!-- ============ 第三方库 ============ -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+
+<!-- ============ 全局配置 ============ -->
+<script src="../assets/js/config/domains.config.js"></script>
+<script src="../assets/js/config/centers.config.js"></script>
+<script src="../assets/js/config/provinces.config.js"></script>
+
+<!-- ============ 省份元数据（每个省页只改这里） ============ -->
+<script>
+  window.PROVINCE_META = {
+    key: 'hubei',
+    label: '鄂',
+    fullTitle: '湖北省住建厅机会点作战地图',
+    subtitle: 'HUBEI HOUSING & CONSTRUCTION OPPORTUNITY MAP'
+  };
+</script>
+
+<!-- ============ 省份专属数据 ============ -->
+<script src="./data/hubei-overlays.js"></script>
+<script src="./data/hubei-data.js"></script>
+
+<!-- ============ 省页通用 app 工厂 ============ -->
+<script src="../assets/js/vendor/sheetjs.min.js"></script>
+<script src="../assets/js/core/data-importer.js"></script>
+<script src="../assets/js/core/geojson-loader.js"></script>
+<script src="../assets/js/core/province-app.js"></script>
+</head>
+<body>
+<div id="app">
+  <!-- HOME PAGE -->
+  <div id="page-home" class="page active">
+    <div class="header">
+      <div class="header-left">
+        <div class="logo-mark" id="logoMark">鄂</div>
+        <div class="title-group">
+          <h1 id="pageTitle">湖北省住建厅机会点作战地图</h1>
+          <p id="pageSubtitle">HUBEI HOUSING &amp; CONSTRUCTION OPPORTUNITY MAP</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <a href="../index.html" class="back-btn">← 返回全国总览</a>
+        <div class="nav-crumb"><span class="crumb active">省级总览</span></div>
+      </div>
+    </div>
+    <div class="main">
+      <div class="sidebar">
+        <div class="panel" style="flex:1; display:flex; flex-direction:column;">
+          <div class="panel-head"><h3>四大核心领域</h3><span class="tag">DOMAINS</span></div>
+          <div class="panel-body" style="flex:1; overflow-y:auto;" id="domainCards"></div>
+        </div>
+      </div>
+      <div class="center">
+        <div class="map-wrap">
+          <div id="leafletMap"></div>
+          <div class="drill-status" id="drillStatus" onclick="app.exitDrill()">🔙 返回全省视图</div>
+          <div class="map-controls" id="mapControls"></div>
+          <div class="map-legend" id="mapLegend"></div>
+        </div>
+        <div class="map-stats-bar" id="mapBottomBar"></div>
+      </div>
+      <div class="sidebar right">
+        <div class="panel" style="flex:1; display:flex; flex-direction:column;">
+          <div class="panel-head"><h3 id="capTitle">移动核心产品能力</h3><span class="tag" id="capTag">CAPABILITIES</span></div>
+          <div class="panel-body" style="flex:1; overflow-y:auto;" id="capPanel"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BATTLE PAGE -->
+  <div id="page-battle" class="page">
+    <div class="header">
+      <div class="header-left">
+        <div class="logo-mark" id="battleLogo">鄂</div>
+        <div class="title-group">
+          <h1 id="battleTitle">作战地图</h1>
+          <p id="battleSubtitle">BATTLE MAP</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <a href="../index.html" class="back-btn">← 返回全国总览</a>
+        <div class="nav-crumb">
+          <span class="crumb" onclick="app.go('home')">省级总览</span>
+          <span class="sep">/</span>
+          <span class="crumb active" id="battleCrumb">作战地图</span>
+        </div>
+        <div class="back-btn" onclick="app.go('home')">← 返回总览</div>
+      </div>
+    </div>
+    <div class="battle-main">
+      <div class="domain-tabs" id="battleTabs"></div>
+      <div class="battle-content" id="battleContent"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* —— 应用省份元数据到 DOM —— */
+  (function applyMeta() {
+    var meta = window.PROVINCE_META;
+    document.title = meta.fullTitle;
+    ['logoMark','battleLogo'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = meta.label;
+    });
+    ['pageTitle','battleTitle'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = meta.fullTitle;
+    });
+    ['pageSubtitle','battleSubtitle'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = meta.subtitle;
+    });
+  })();
+
+  /* —— 启动省页 app —— */
+  window.addEventListener('load', function() {
+    var meta = window.PROVINCE_META;
+    var adcode = window.findProvinceByKey(meta.key) ? window.findProvinceByKey(meta.key).adcode : null;
+    if (!adcode) { console.error('未找到省份 ' + meta.key + ' 的 adcode'); return; }
+    loadProvinceGeoJSON(meta.key, adcode).then(function() {
+      window.app = createProvinceApp(meta);
+      window.app.init();
+    }).catch(function(err) {
+      console.error('GeoJSON 加载失败:', err);
+      alert('省份地图数据加载失败：' + err.message + '\n请检查网络后刷新页面。');
+    });
+  });
+</script>
+</body>
+</html>

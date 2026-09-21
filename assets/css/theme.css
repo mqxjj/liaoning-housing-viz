@@ -1,0 +1,248 @@
+/* ===================================================================
+ * 科技深空主题 - 全国作战地图可视化项目共享主题
+ * 暗色背景 + 霓虹品牌色 + 六大中心独立配色
+ * 在所有页面（全国总览/沉浸式大屏/省页）共享
+ * =================================================================== */
+
+:root {
+  /* —— 基础色板（科技深空） —— */
+  --bg-base: #1a3050;
+  --bg-deep: #11243d;
+  --bg-panel: rgba(30, 56, 94, 0.90);
+  --bg-panel-solid: #1e385e;
+  --bg-card: rgba(40, 72, 116, 0.78);
+  --bg-hover: rgba(56,189,248,0.12);
+  --border: rgba(125,211,252,0.30);
+  --border-bright: rgba(125,211,252,0.60);
+
+  /* —— 品牌霓虹色 —— */
+  --cyan: #38bdf8;
+  --cyan-light: #bae6fd;
+  --cyan-deep: #0284c7;
+  --purple: #a78bfa;
+  --green: #34d399;
+  --amber: #fbbf24;
+  --orange: #fb923c;
+  --red: #f87171;
+  --pink: #f472b6;
+
+  /* —— 文字层级 —— */
+  --text: #e6f2ff;
+  --text-bright: #f8fbff;
+  --text-dim: #a8bcd4;
+  --text-faint: #7a90ad;
+
+  /* —— 六大区域中心配色（主色 + 暗色变体） —— */
+  --center-1: #fbbf24;        /* 一中心(华北) - 金 */
+  --center-1-dim: #92660a;
+  --center-2: #22d3ee;        /* 二中心(华东) - 青 */
+  --center-2-dim: #0e7490;
+  --center-3: #a78bfa;        /* 三中心(西南) - 紫 */
+  --center-3-dim: #6d28d9;
+  --center-4: #60a5fa;        /* 四中心(东北) - 冰蓝 */
+  --center-4-dim: #1e40af;
+  --center-5: #34d399;        /* 五中心(华中南) - 翠绿 */
+  --center-5-dim: #047857;
+  --center-6: #f87171;        /* 六中心(西北) - 赤红 */
+  --center-6-dim: #b91c1c;
+
+  /* —— 渐变光晕（六中心色） —— */
+  --grad-1: linear-gradient(135deg, #fbbf24, #f59e0b);
+  --grad-2: linear-gradient(135deg, #22d3ee, #0891b2);
+  --grad-3: linear-gradient(135deg, #a78bfa, #7c3aed);
+  --grad-4: linear-gradient(135deg, #60a5fa, #2563eb);
+  --grad-5: linear-gradient(135deg, #34d399, #059669);
+  --grad-6: linear-gradient(135deg, #f87171, #dc2626);
+
+  /* —— 阴影系统 —— */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.45);
+  --shadow-glow-cyan: 0 0 18px rgba(56,189,248,0.45);
+  --shadow-glow-purple: 0 0 18px rgba(167,139,250,0.45);
+
+  /* —— 字体 —— */
+  --font-sans: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", sans-serif;
+  --font-mono: "SF Mono", "Consolas", "Courier New", monospace;
+}
+
+/* —— 基础重置 —— */
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  width:100%; height:100%;
+  overflow:hidden;
+  font-family:var(--font-sans);
+  color:var(--text);
+  background:var(--bg-base);
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 18% 8%, rgba(56,189,248,0.16), transparent 55%),
+    radial-gradient(ellipse at 82% 92%, rgba(167,139,250,0.12), transparent 55%),
+    linear-gradient(180deg, #1c3656 0%, #10243e 100%);
+}
+
+/* 全局网格背景 */
+body::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    linear-gradient(rgba(56,189,248,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56,189,248,0.045) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+#app {
+  position:relative; z-index:1;
+  width:100%; height:100%;
+  display:flex; flex-direction:column;
+}
+
+/* —— 通用面板（panel 装饰 + 角标） —— */
+.panel {
+  background:var(--bg-panel);
+  border:1px solid var(--border);
+  border-radius:8px;
+  backdrop-filter:blur(8px);
+  position:relative;
+  overflow:hidden;
+  box-shadow: var(--shadow-md);
+}
+.panel::before {
+  content:''; position:absolute; top:0; left:0; width:10px; height:10px;
+  border-top:2px solid var(--cyan); border-left:2px solid var(--cyan);
+}
+.panel::after {
+  content:''; position:absolute; bottom:0; right:0; width:10px; height:10px;
+  border-bottom:2px solid var(--cyan); border-right:2px solid var(--cyan);
+}
+.panel-head {
+  padding:8px 14px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid rgba(56,189,248,0.12);
+  background:linear-gradient(90deg, rgba(56,189,248,0.07), transparent);
+}
+.panel-head h3 {
+  font-size:13px; font-weight:600; color:var(--cyan-light);
+  letter-spacing:1px; display:flex; align-items:center; gap:6px;
+}
+.panel-head h3::before {
+  content:''; width:3px; height:12px;
+  background:var(--cyan); border-radius:2px;
+  box-shadow:0 0 6px var(--cyan);
+}
+.panel-head .tag { font-size:10px; color:var(--text-faint); }
+.panel-body { padding:12px 14px; }
+
+/* —— Header 通用 —— */
+.header {
+  height:58px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 24px;
+  background: linear-gradient(180deg, rgba(22,44,74,0.95) 0%, rgba(22,44,74,0.4) 100%);
+  border-bottom:1px solid var(--border);
+  position:relative;
+}
+.header::after {
+  content:''; position:absolute; bottom:-1px; left:50%; transform:translateX(-50%);
+  width:55%; height:1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+}
+.header-left, .header-right { display:flex; align-items:center; gap:14px; }
+
+.logo-mark {
+  width:36px; height:36px; border-radius:9px;
+  background:linear-gradient(135deg, var(--cyan), var(--purple));
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; color:#0a1828; font-size:18px;
+  box-shadow:0 0 18px rgba(56,189,248,0.45);
+}
+
+.title-group h1 {
+  font-size:20px; font-weight:700; letter-spacing:2px;
+  background:linear-gradient(90deg, #bae6fd, #ddd6fe);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.title-group p {
+  font-size:10px; color:var(--text-faint);
+  letter-spacing:2px; margin-top:1px;
+}
+
+.nav-crumb {
+  display:flex; align-items:center; gap:6px;
+  font-size:12px; color:var(--text-faint);
+}
+.nav-crumb .crumb {
+  cursor:pointer; padding:3px 10px; border-radius:4px;
+  transition:all .2s;
+}
+.nav-crumb .crumb:hover { color:var(--cyan); background:rgba(56,189,248,0.08); }
+.nav-crumb .crumb.active { color:var(--cyan-light); }
+.nav-crumb .sep { color:var(--text-faint); }
+
+.back-btn {
+  cursor:pointer; padding:5px 12px; border-radius:4px;
+  font-size:12px;
+  border:1px solid var(--border-bright);
+  color:var(--cyan-light);
+  background:rgba(56,189,248,0.06);
+  transition:all .2s;
+}
+.back-btn:hover {
+  background:rgba(56,189,248,0.18);
+  box-shadow:0 0 12px rgba(56,189,248,0.25);
+}
+
+/* —— 工具类 —— */
+.text-cyan { color:var(--cyan); }
+.text-purple { color:var(--purple); }
+.text-amber { color:var(--amber); }
+.text-green { color:var(--green); }
+.text-dim { color:var(--text-dim); }
+.text-faint { color:var(--text-faint); }
+
+.center-1-text { color:var(--center-1); }
+.center-2-text { color:var(--center-2); }
+.center-3-text { color:var(--center-3); }
+.center-4-text { color:var(--center-4); }
+.center-5-text { color:var(--center-5); }
+.center-6-text { color:var(--center-6); }
+
+.center-1-bg { background:var(--grad-1); color:#1a1a1a; }
+.center-2-bg { background:var(--grad-2); color:#0a1828; }
+.center-3-bg { background:var(--grad-3); color:#0a1828; }
+.center-4-bg { background:var(--grad-4); color:#0a1828; }
+.center-5-bg { background:var(--grad-5); color:#0a1828; }
+.center-6-bg { background:var(--grad-6); color:#0a1828; }
+
+/* —— Toast 提示 —— */
+.toast {
+  position:fixed; top:80px; right:24px; z-index:9999;
+  padding:12px 18px; border-radius:6px;
+  background:rgba(15,31,55,0.96);
+  border:1px solid var(--cyan);
+  color:var(--text-bright);
+  font-size:13px;
+  box-shadow:0 0 18px rgba(56,189,248,0.4);
+  transform:translateX(120%);
+  transition:transform .35s cubic-bezier(.4,1.4,.6,1);
+}
+.toast.show { transform:translateX(0); }
+.toast.success { border-color:var(--green); box-shadow:0 0 18px rgba(52,211,153,0.4); }
+.toast.error { border-color:var(--red); box-shadow:0 0 18px rgba(248,113,113,0.4); }
+
+/* —— 滚动条美化 —— */
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb { background:rgba(56,189,248,0.3); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:rgba(56,189,248,0.5); }
+
+/* —— prefers-reduced-motion 降级 —— */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+  }
+}

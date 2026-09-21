@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>全国作战地图 · 沉浸式大屏</title>
+  <meta name="description" content="六张网可视化 · 全国作战地图沉浸式大屏版 - 星空粒子 + 发光地图 + 中心光环 + 动态光带 + 3D 立体 + 鼠标视差" />
+  <link rel="stylesheet" href="./assets/css/theme.css">
+  <link rel="stylesheet" href="./assets/css/home-immersive.css">
+  <link rel="stylesheet" href="./assets/css/data-importer.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+  <div id="app" class="imm-app">
+
+    <!-- 1. 星空粒子背景 -->
+    <canvas id="imm-starfield"></canvas>
+
+    <!-- 2. 视差三层 -->
+    <div class="imm-layer imm-layer-back" id="imm-layer-back"></div>
+
+    <div class="imm-layer imm-layer-mid" id="imm-layer-mid">
+      <!-- 4. 地图 stage（perspective 3D 倾斜） -->
+      <div class="imm-map-stage" id="imm-map-stage">
+        <div id="imm-map" style="width:100%;height:100%;"></div>
+      </div>
+      <!-- SVG 同心圆光环层 -->
+      <div class="imm-halo-layer" id="imm-halo-layer"></div>
+    </div>
+
+    <div class="imm-layer imm-layer-front" id="imm-layer-front">
+      <!-- 顶部 HUD -->
+      <div class="imm-hud-top">
+        <div class="imm-hud-left">
+          <div class="imm-logo-mark">六</div>
+          <div class="imm-title-group">
+            <h1>全国作战地图</h1>
+            <p>SIX-NET BATTLE COMMAND · 31 PROVINCES</p>
+          </div>
+        </div>
+        <div class="imm-hud-right">
+          <!-- HUD 装饰 SVG -->
+          <svg class="imm-hud-deco" viewBox="0 0 160 14" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 7 L18 7 L22 2 L38 2 L42 7 L58 7 L62 12 L78 12 L82 7 L98 7 L102 2 L118 2 L122 7 L138 7 L142 12 L160 12"
+                  stroke="#38bdf8" stroke-width="1" fill="none" opacity="0.6"/>
+            <circle cx="22" cy="2" r="1.5" fill="#fbbf24"/>
+            <circle cx="62" cy="12" r="1.5" fill="#34d399"/>
+            <circle cx="102" cy="2" r="1.5" fill="#a78bfa"/>
+            <circle cx="142" cy="12" r="1.5" fill="#f87171"/>
+          </svg>
+          <div class="imm-clock" id="imm-clock"></div>
+          <a class="imm-back-link" href="./index.html" title="返回 A 版全国总览">
+            <span>A 版总览</span><span>→</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 左下角 6 中心徽标栏 -->
+      <div class="imm-center-bar" id="imm-center-bar"></div>
+
+      <!-- 右侧抽屉式中心信息面板 -->
+      <div class="imm-drawer" id="imm-drawer">
+        <!-- 内容由 JS 渲染注入 -->
+      </div>
+
+      <!-- 底部数据汇总条 -->
+      <div class="imm-hud-bottom">
+        <div class="imm-foot-stats">
+          <div class="imm-foot-stat">
+            <div class="ff-val" id="imm-ff-total">0</div>
+            <div class="ff-lab">全国总机会点</div>
+          </div>
+          <div class="imm-foot-stat amber">
+            <div class="ff-val" id="imm-ff-five">0</div>
+            <div class="ff-lab">五星商机</div>
+          </div>
+          <div class="imm-foot-stat green">
+            <div class="ff-val" id="imm-ff-enabled">0</div>
+            <div class="ff-lab">已部署省份</div>
+          </div>
+          <div class="imm-foot-stat purple">
+            <div class="ff-val" id="imm-ff-centers">0</div>
+            <div class="ff-lab">中心覆盖</div>
+          </div>
+        </div>
+        <div class="imm-foot-tip">
+          提示：点击地图省份或中心徽标 · <b>6</b> 中心 · <b>31</b> 省覆盖
+        </div>
+      </div>
+    </div>
+
+    <!-- 加载层 -->
+    <div class="imm-loading" id="imm-loading">
+      <div class="spinner"></div>
+      <div>加载沉浸式作战地图...</div>
+    </div>
+
+    <!-- toast -->
+    <div class="imm-toast" id="imm-toast"></div>
+  </div>
+
+  <!-- 配置 -->
+  <script src="./assets/js/config/centers.config.js"></script>
+  <script src="./assets/js/config/provinces.config.js"></script>
+  <script src="./assets/js/config/domains.config.js"></script>
+  <!-- 5 省数据 -->
+  <script src="./provinces/data/liaoning-data.js"></script>
+  <script src="./provinces/data/fujian-data.js"></script>
+  <script src="./provinces/data/hubei-data.js"></script>
+  <script src="./provinces/data/shaanxi-data.js"></script>
+  <script src="./provinces/data/sichuan-data.js"></script>
+  <!-- 全国汇总 -->
+  <script src="./data/national-summary.js"></script>
+  <!-- 沉浸式 App -->
+  <script src="./assets/js/vendor/sheetjs.min.js"></script>
+  <script src="./assets/js/core/data-importer.js"></script>
+  <script src="./assets/js/core/immersive-app.js"></script>
+</body>
+</html>
