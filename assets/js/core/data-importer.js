@@ -29,6 +29,7 @@ window.DataImporter = (function () {
     '行业高价值场景': 'scenes',
     '中国移动能力点': 'capabilities',
     '切入话术': 'talk',
+    '切入话题': 'talk',
     '政策依据': 'policy',
     '商机与历史招采': 'opportunities',
     '商机优先级': 'priority'
@@ -266,20 +267,31 @@ window.DataImporter = (function () {
   // ============== 字段映射 ==============
   function parseRows(rows) {
     if (!rows || rows.length < 2) return [];
-    // 找表头
-    var header = rows[0];
+    // 兼容封面行：在前 20 行中选择匹配字段最多的一行作为表头
+    var headerIndex = -1;
     var colIdx = {};
-    for (var c = 0; c < header.length; c++) {
-      var h = String(header[c]).trim();
-      // 匹配同义词
-      Object.keys(FIELD_MAP).forEach(function (k) {
-        if (h.indexOf(k) >= 0) colIdx[FIELD_MAP[k]] = c;
-      });
+    var maxMatches = 0;
+    for (var r = 0; r < Math.min(rows.length, 20); r++) {
+      var candidate = {};
+      var header = rows[r] || [];
+      for (var c = 0; c < header.length; c++) {
+        var h = String(header[c]).trim();
+        Object.keys(FIELD_MAP).forEach(function (k) {
+          if (h.indexOf(k) >= 0) candidate[FIELD_MAP[k]] = c;
+        });
+      }
+      var matches = Object.keys(candidate).length;
+      if (matches > maxMatches) {
+        maxMatches = matches;
+        headerIndex = r;
+        colIdx = candidate;
+      }
     }
+    if (headerIndex < 0 || maxMatches < 3 || colIdx.target === undefined) return [];
 
     var result = [];
     var autoId = 1;
-    for (var i = 1; i < rows.length; i++) {
+    for (var i = headerIndex + 1; i < rows.length; i++) {
       var row = rows[i];
       if (!row || row.length === 0) continue;
       // 跳过分隔行

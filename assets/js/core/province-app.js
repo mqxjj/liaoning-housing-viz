@@ -16,10 +16,11 @@ function createProvinceApp(provinceConfig) {
   'use strict';
 
   const app = {
-  state: { view:'home', city:null, selectedDomain:'lifeline', battleDomain:null, battleLevel:'province', drilledCity:null, mapCity:null },
+  state: { provinceKey:provinceConfig.key, view:'home', city:null, selectedDomain:'lifeline', battleDomain:null, battleLevel:'province', drilledCity:null, mapCity:null },
   data: (window.PROVINCE_DATA[provinceConfig.key] || []).filter(d => d.category && d.category.trim()),
   geo: window.PROVINCE_GEOJSON[provinceConfig.key],
   ov: window.PROVINCE_OVERLAYS[provinceConfig.key] || {},
+  homeCenter: provinceConfig.center ? [provinceConfig.center[1], provinceConfig.center[0]] : [41.5, 122.5],
   map: null,
   mapLayers: {},
   cityGeoLayer: null,
@@ -41,6 +42,26 @@ function createProvinceApp(provinceConfig) {
     this.initMap();
     this.highlightDomainCities(this.state.selectedDomain);
     window.addEventListener('resize', () => { if(this.map) this.map.invalidateSize(); if(this.battleMap) this.battleMap.resize(); });
+  },
+
+  refreshAll() {
+    this.data = (window.PROVINCE_DATA[provinceConfig.key] || []).filter(d => d.category && d.category.trim());
+    if(this.state.view === 'battle') this.go('home');
+    this.state.mapCity = null;
+    this.getCityOpportunityCounts();
+    this.renderDomainCards();
+    this.renderCapPanel();
+    this.renderMapBottomBar();
+    if(this.map) {
+      this.stopFlowAnimation();
+      this.map.remove();
+      this.map = null;
+      this.mapLayers = {};
+      this.cityLabels = {};
+      this.flowAnimations = [];
+      this.initMap();
+      this.highlightDomainCities(this.state.selectedDomain);
+    }
   },
 
   go(view, opts={}) {
@@ -232,7 +253,8 @@ function createProvinceApp(provinceConfig) {
   // ===== Leaflet Map =====
   initMap() {
     const ov = this.ov;
-    this.map = L.map('leafletMap', { zoomControl:false, attributionControl:false, minZoom:6, maxZoom:14 }).setView([41.5, 122.5], 7);
+    this.map = L.map('leafletMap', { zoomControl:false, attributionControl:false, minZoom:provinceConfig.fitBounds ? 5 : 6, maxZoom:14 }).setView(this.homeCenter, 7);
+    if(provinceConfig.fitBounds) this.map.fitBounds(L.geoJSON(this.geo).getBounds(), { padding:[8,8] });
 
     // 地形起伏DOM阴影层（Esri World Hillshade），模拟山区地形起伏感
     const terrain = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}', {
@@ -605,7 +627,8 @@ function createProvinceApp(provinceConfig) {
     this.state.drilledCity = null;
     this.state.mapCity = null;
     document.getElementById('drillStatus').style.display = 'none';
-    this.map.setView([41.5, 122.5], 7);
+    if(provinceConfig.fitBounds) this.map.fitBounds(L.geoJSON(this.geo).getBounds(), { padding:[8,8] });
+    else this.map.setView(this.homeCenter, 7);
     // 恢复全省管网
     this.rebuildPipeLayers(null);
     this.highlightDomainCities(this.state.selectedDomain);
@@ -867,7 +890,7 @@ function createProvinceApp(provinceConfig) {
   // 二级页面地市级 Leaflet 地图：地形+卫星图+该市边界+管网+设施
   initCityBattleLeaflet(city, items) {
     // 销毁旧地图
-    if(this._battleLeaflet) { this._battleLeaflet.remove(); this._battleLeaflet = null; }
+    if(this._battleLeaflet) { this._battleLeaflet.stop(); this._battleLeaflet.remove(); this._battleLeaflet = null; }
     if(this._battleFlowRAF) { cancelAnimationFrame(this._battleFlowRAF); this._battleFlowRAF = null; }
     this._battleFlowAnims = [];
 
@@ -878,7 +901,7 @@ function createProvinceApp(provinceConfig) {
 
     const map = L.map('battleLeaflet', { zoomControl:false, attributionControl:false, minZoom:6, maxZoom:16 })
       .setView([center.lat, center.lng], 9);
-    map.fitBounds(cityBounds, { padding:[20,20], maxZoom:11 });
+    map.fitBounds(cityBounds, { padding:[20,20], maxZoom:11, animate:false });
 
     // 地形起伏DOM阴影层
     L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}', {
@@ -894,6 +917,7 @@ function createProvinceApp(provinceConfig) {
       fetch(`https://geo.datav.aliyun.com/areas_v3/bound/${adcode}_full.json`)
         .then(r => r.json())
         .then(geo => {
+          if(this._battleLeaflet !== map) return;
           L.geoJSON(geo, {
             style: { color:'#38bdf8', weight:1.5, fillColor:'rgba(56,189,248,0.18)', fillOpacity:0.5, dashArray:'4 3' },
             onEachFeature: (f, layer) => {
@@ -1037,7 +1061,7 @@ function createProvinceApp(provinceConfig) {
     this._battleFlowRAF = requestAnimationFrame(step);
 
     // resize 时刷新
-    setTimeout(() => map.invalidateSize(), 100);
+    setTimeout(() => { if(this._battleLeaflet === map) map.invalidateSize(); }, 100);
   },
 
   toggleBattleLayer(key) {

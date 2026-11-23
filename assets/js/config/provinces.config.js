@@ -36,7 +36,7 @@ window.PROVINCES = [
   /* —— 四中心（东北） —— */
   { key:'neimenggu',  name:'内蒙古', adcode:150000, center:[111.75,40.84],  capital:'呼和浩特', enabled:false, aliases:['内蒙古','neimenggu','nmg','蒙','呼和浩特','内蒙古自治区'] },
   { key:'liaoning',   name:'辽宁',   adcode:210000, center:[123.43,41.80],  capital:'沈阳',   enabled:true,  aliases:['辽宁','liaoning','ln','辽','沈阳','辽宁省'] },
-  { key:'jilin',      name:'吉林',   adcode:220000, center:[125.32,43.90],  capital:'长春',   enabled:false, aliases:['吉林','jilin','jl','吉','长春','吉林省'] },
+  { key:'jilin',      name:'吉林',   adcode:220000, center:[125.32,43.90],  capital:'长春',   enabled:true,  aliases:['吉林','jilin','jl','吉','长春','吉林省'] },
   { key:'heilongjiang', name:'黑龙江', adcode:230000, center:[126.64,45.75], capital:'哈尔滨', enabled:false, aliases:['黑龙江','heilongjiang','hlj','黑','哈尔滨','黑龙江省'] },
 
   /* —— 五中心（华中南） —— */

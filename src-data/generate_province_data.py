@@ -3,7 +3,7 @@
 generate_province_data.py
 =========================
 
-读取 4 省 xlsx (福建 / 湖北 / 陕西 / 四川) 的"作战地图" sheet,
+读取 5 省 xlsx (福建 / 湖北 / 陕西 / 四川 / 吉林) 的"作战地图" sheet,
 按全国作战地图实施方案的字段映射规则, 生成结构化的省页数据 JS 文件。
 
 产物:
@@ -53,6 +53,7 @@ PROVINCES = [
     ('hubei',   '湖北', 'hubei.xlsx',   '湖北省作战地图'),
     ('shaanxi', '陕西', 'shaanxi.xlsx', '作战地图'),
     ('sichuan', '四川', 'sichuan.xlsx', '作战地图'),
+    ('jilin',   '吉林', 'jilin.xlsx',   '作战地图'),
 ]
 
 
@@ -339,7 +340,7 @@ def write_js(path, content):
 # ----------------------------------------------------------------------------
 def main():
     print('=' * 60)
-    print('generate_province_data.py - 4 省数据生成')
+    print('generate_province_data.py - 5 省数据生成')
     print('=' * 60)
 
     # 检查 openpyxl
